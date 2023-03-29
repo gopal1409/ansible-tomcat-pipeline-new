@@ -35,7 +35,7 @@
         extra_opts: [--strip-components=1]
         create: /usr/share/tomcat/bin 
     - name: create a service file for tomcat 
-      templates:
+      template:
         src: templates/tomcat.service.j2 
         dest: /etc/systemd/system/tomcat.servive
     - name: start and enable tomcat
