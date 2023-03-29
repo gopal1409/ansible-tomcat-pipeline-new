@@ -44,12 +44,14 @@
       template:
         src: templates/tomcat.service.j2 
         dest: /etc/systemd/system/tomcat.servive
+      when: ansible_service_mgr == 'systemd'
     - name: start and enable tomcat
       service:
         daemon_reload: yes 
         name: tomcat 
         state: started 
         enabled: yes 
+      when: ansible_service_mgr == 'systemd'
     - name: test the tomcat server
       uri:
         url: http://localhost:8080
