@@ -1,0 +1,53 @@
+---
+- name: install tomcat to host
+  hosts: all
+  vars:
+    tomcat_download_url: https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.73/bin/apache-tomcat-9.0.73.tar.gz
+    tomcat_download_location: /usr/share/tomcat/apache-tomcat-9.0.73.tar.gz
+  
+  tasks:
+    - name: install java
+      apt: 
+        name: default-jdk 
+        state: present
+        update_cache: yes
+    - name: Ensure group "tomcat" exists
+      ansible.builtin.group:
+        name: tomcat
+        state: present
+    - name: Add the user 'johnd' with a specific uid and a primary group of 'admin'
+      ansible.builtin.user:
+        name: tomcat 
+        state: present
+        group: tomcat 
+        home: /usr/share/tomcat createhome=no
+    - name: download tomcat 
+      ansible.builtin.get_url:
+        url: "{{tomcat_download_url}}"
+        dest:  "{{tomcat_download_location}}"
+    - name: extract tomcat 
+      unarchive:
+        src: "{{tomcat_download_location}}"
+        dest: /usr/share/tomcat 
+        owner: tomcat 
+        group: tomcat 
+        remote_src: yes 
+        extra_opts: [--strip-components=1]
+        create: /usr/share/tomcat/bin 
+    - name: create a service file for tomcat 
+      templates:
+        src: templates/tomcat.service.j2 
+        dest: /etc/systemd/system/tomcat.servive
+    - name: start and enable tomcat
+      service:
+        daemon_reload: yes 
+        name: tomcat 
+        state: started 
+        enabled: yes 
+    - name: test the tomcat server
+      uri:
+        url: http://localhost:8080
+      register: result 
+      until: "result.status == 200"
+      retries: 5
+      delay: 5
