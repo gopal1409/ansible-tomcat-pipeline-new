@@ -56,11 +56,11 @@
       #there are different type of firewall in different os. redhat firewalld ufw
       ##3if you look into the task by default where it will execute
       
-      #when: ansible_service_mgr == 'systemd'
-    - name: test the tomcat server
-      uri:
-        url: http://localhost:8080
-      register: result 
-      until: "result.status == 200"
-      retries: 5
-      delay: 5
+     #when: ansible_service_mgr == 'systemd'
+      - name: test the tomcat server
+        uri:
+          url: http://localhost:8080
+          register: result 
+          until: "result.status == 200"
+          retries: 5
+          delay: 5
